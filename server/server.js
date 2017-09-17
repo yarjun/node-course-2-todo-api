@@ -26,17 +26,17 @@ app.post("/todos",function(req,res){
 });
 });
 
-app.post("/user",function(req,res){
-  var user = new User({
-    email: req.body.text
-  });
-
-  user.save().then(function(doc){
-    res.send(doc);
-  },function(err){
-    res.status(400).send(err);
-  });
-});
+// app.post("/user",function(req,res){
+//   var user = new User({
+//     email: req.body.text
+//   });
+//
+//   user.save().then(function(doc){
+//     res.send(doc);
+//   },function(err){
+//     res.status(400).send(err);
+//   });
+// });
 
 app.get("/todos",function(req,res){
   Todo.find().then(function(todos){
@@ -99,6 +99,19 @@ app.patch('/todos/:id',function(req,res){
     }
 
     res.status(200).send(todo);
+  }).catch(function(e){
+    res.status(400).send(e);
+  });
+});
+
+app.post('/users',function(req,res){
+  var body = _.pick(req.body,['email','password']);
+  var user = new User(body);
+
+  user.save().then(function(){
+    return user.generateAuthToken();
+  }).then(function(token){
+    res.header('x-auth',token).send(user);
   }).catch(function(e){
     res.status(400).send(e);
   });
